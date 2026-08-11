@@ -8,11 +8,13 @@ import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class FilmsService {
-  constructor(@InjectModel(Film.name) private filmModel: Model<FilmDocument>) { }
+  constructor(@InjectModel(Film.name) private filmModel: Model<FilmDocument>) {}
 
   async findAll(): Promise<FilmResponseDto[]> {
     const films = await this.filmModel.find().select('-sessions').lean().exec();
-    return films.map(film => plainToClass(FilmResponseDto, { ...film, id: film._id.toString() }));
+    return films.map((film) =>
+      plainToClass(FilmResponseDto, { ...film, id: film._id.toString() }),
+    );
   }
 
   async findSchedule(filmId: string): Promise<SessionResponseDto[]> {
@@ -21,9 +23,11 @@ export class FilmsService {
       throw new NotFoundException('Film not found');
     }
 
-    return (film.schedule || []).map(session => plainToClass(SessionResponseDto, {
-      ...session,
-      film: filmId,
-    }));
+    return (film.schedule || []).map((session) =>
+      plainToClass(SessionResponseDto, {
+        ...session,
+        film: filmId,
+      }),
+    );
   }
 }

@@ -8,22 +8,35 @@ import { OrderResultDto } from './dto/result-order.dto';
 
 @Injectable()
 export class OrderService {
-  constructor(@InjectModel(Film.name) private filmModel: Model<FilmDocument>) { }
+  constructor(@InjectModel(Film.name) private filmModel: Model<FilmDocument>) {}
 
   async createOrder(orderDto: OrderRequestDto): Promise<OrderResultDto[]> {
     const results: OrderResultDto[] = [];
 
-    const ticketsBySession = new Map<string, { filmId: string; sessionId: string; tickets: { row: number; seat: number }[] }>();
+    const ticketsBySession = new Map<
+      string,
+      {
+        filmId: string;
+        sessionId: string;
+        tickets: { row: number; seat: number }[];
+      }
+    >();
 
     for (const ticket of orderDto.tickets) {
       const key = `${ticket.film}:${ticket.session}`;
       if (!ticketsBySession.has(key)) {
-        ticketsBySession.set(key, { filmId: ticket.film, sessionId: ticket.session, tickets: [] });
+        ticketsBySession.set(key, {
+          filmId: ticket.film,
+          sessionId: ticket.session,
+          tickets: [],
+        });
       }
-      ticketsBySession.get(key).tickets.push({ row: ticket.row, seat: ticket.seat });
+      ticketsBySession
+        .get(key)
+        .tickets.push({ row: ticket.row, seat: ticket.seat });
     }
 
-    for (const [key, group] of ticketsBySession) {
+    for (const [, group] of ticketsBySession) {
       const { filmId, sessionId, tickets } = group;
 
       const film = await this.filmModel.findById(filmId);
@@ -31,7 +44,7 @@ export class OrderService {
         throw new BadRequestException(`Film with id ${filmId} not found`);
       }
 
-      const session = film.schedule.find(s => s.id === sessionId);;
+      const session = film.schedule.find((s) => s.id === sessionId);
       if (!session) {
         throw new BadRequestException(`Session with id ${sessionId} not found`);
       }

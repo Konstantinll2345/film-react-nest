@@ -29,7 +29,6 @@ export type FilmDocument = Film & Document;
 
 @Schema()
 export class Film {
-
   @Prop({ type: [Session], default: [] })
   schedule: Session[];
 }

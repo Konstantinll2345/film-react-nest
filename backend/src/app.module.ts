@@ -32,4 +32,4 @@ import { OrderModule } from './order/dto/order.module';
     OrderModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}
