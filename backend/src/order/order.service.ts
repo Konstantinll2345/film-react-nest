@@ -1,18 +1,17 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
-import { Film, FilmDocument } from '../shemas/film.shema';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { FilmsRepository } from '../films/films.repository';
 import { OrderRequestDto } from './dto/order.dto';
 import { OrderResultDto } from './dto/result-order.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class OrderService {
-  constructor(@InjectModel(Film.name) private filmModel: Model<FilmDocument>) {}
+  constructor(private readonly filmsRepository: FilmsRepository) {}
 
   async createOrder(orderDto: OrderRequestDto): Promise<OrderResultDto[]> {
     const results: OrderResultDto[] = [];
 
+    // Группируем билеты по сеансу
     const ticketsBySession = new Map<
       string,
       {
@@ -39,7 +38,7 @@ export class OrderService {
     for (const [, group] of ticketsBySession) {
       const { filmId, sessionId, tickets } = group;
 
-      const film = await this.filmModel.findById(filmId);
+      const film = await this.filmsRepository.findById(filmId);
       if (!film) {
         throw new BadRequestException(`Film with id ${filmId} not found`);
       }
@@ -58,11 +57,10 @@ export class OrderService {
       }
 
       for (const t of tickets) {
-        const seatKey = `${t.row}:${t.seat}`;
-        session.taken.push(seatKey);
+        session.taken.push(`${t.row}:${t.seat}`);
       }
 
-      await film.save();
+      await this.filmsRepository.updateFilm(film);
 
       for (const t of tickets) {
         results.push({
