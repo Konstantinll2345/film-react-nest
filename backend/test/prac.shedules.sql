@@ -1,0 +1,2 @@
+INSERT INTO schedules (id, "filmId", daytime, hall, rows, seats, price, taken) VALUES
+('95ab4a20-9555-4a06-bfac-184b8c53fe70', 'd290f1ee-6c54-4b01-90e6-d701748f0851', '2023-05-29 10:30:00', '2', 5, 10, 350, '{"1:2", "3:4"}');

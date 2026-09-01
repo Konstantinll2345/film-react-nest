@@ -1,35 +1,29 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+import { Film } from './entities/film.entity';
+import { Schedule } from './entities/schedule.entity';
 import { FilmsModule } from './films/films.module';
-import { OrderModule } from './order/dto/order.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath: '.env',
-      isGlobal: true,
-    }),
-    MongooseModule.forRootAsync({
+    ConfigModule.forRoot(),
+    TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('DATABASE_URL'),
-      }),
       inject: [ConfigService],
-    }),
-    ServeStaticModule.forRoot({
-      rootPath: join(process.cwd(), 'public/content/afisha'),
-      serveRoot: '/content/afisha',
-      serveStaticOptions: {
-        index: false,
-        redirect: false,
-        fallthrough: false,
-      },
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        url: configService.get('DATABASE_URL'),
+        entities: [Film, Schedule],
+        synchronize: false,
+        extra: {
+          client_encoding: 'UTF8',
+        },
+      }),
     }),
     FilmsModule,
-    OrderModule,
   ],
+  
+  
 })
 export class AppModule {}

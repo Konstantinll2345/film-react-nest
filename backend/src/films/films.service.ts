@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { FilmsRepository } from './films.repository';
+import { FilmsRepository } from '../repository/postgres-film.repository';
 import { FilmResponseDto } from './dto/films.dto';
 import { SessionResponseDto } from './dto/session-films.dto';
 
@@ -13,17 +13,18 @@ export class FilmsService {
     return films.map((film) =>
       plainToInstance(FilmResponseDto, {
         ...film,
-        id: film._id.toString(),
+        id: film.id,
       }),
     );
   }
 
   async findSchedule(filmId: string): Promise<SessionResponseDto[]> {
-    const film = await this.filmsRepository.findSchedule(filmId);
+    const film = await this.filmsRepository.findById(filmId);
     if (!film) {
       throw new NotFoundException('Film not found');
     }
-    return (film.schedule || []).map((session) =>
+
+    return (film.schedules || []).map((session) =>
       plainToInstance(SessionResponseDto, {
         ...session,
         film: filmId,
