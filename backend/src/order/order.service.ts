@@ -1,8 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { FilmsRepository } from '../films/films.repository';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
+import { FilmsRepository } from '../repository/postgres-film.repository';
 import { OrderRequestDto } from './dto/order.dto';
 import { OrderResultDto } from './dto/result-order.dto';
-import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class OrderService {
@@ -11,7 +11,6 @@ export class OrderService {
   async createOrder(orderDto: OrderRequestDto): Promise<OrderResultDto[]> {
     const results: OrderResultDto[] = [];
 
-    // Группируем билеты по сеансу
     const ticketsBySession = new Map<
       string,
       {
@@ -43,7 +42,7 @@ export class OrderService {
         throw new BadRequestException(`Film with id ${filmId} not found`);
       }
 
-      const session = film.schedule.find((s) => s.id === sessionId);
+      const session = film.schedules.find((s) => s.id === sessionId);
       if (!session) {
         throw new BadRequestException(`Session with id ${sessionId} not found`);
       }
@@ -67,7 +66,7 @@ export class OrderService {
           id: uuidv4(),
           film: filmId,
           session: sessionId,
-          daytime: session.daytime,
+          daytime: session.daytime.toISOString(),
           row: t.row,
           seat: t.seat,
           price: session.price,
