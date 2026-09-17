@@ -33,6 +33,6 @@ jobs:
         with:
           context: ./${{ matrix.service }}
           push: true
-          tags: ghcr.io/${{ steps.repo.outputs.name }}/${{ matrix.service }}:latest
+          tags: ghcr.io/konstantinll2345/film-react-nest/${{ matrix.service }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
