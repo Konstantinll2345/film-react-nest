@@ -11,8 +11,8 @@ import { join } from 'path';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
-      serveRoot: '/',
+      rootPath: join(__dirname, '..', 'public', 'content'),
+      serveRoot: '/content',
     }),
     ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
