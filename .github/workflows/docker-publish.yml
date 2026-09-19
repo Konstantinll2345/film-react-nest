@@ -36,3 +36,19 @@ jobs:
           tags: ghcr.io/konstantinll2345/film-react-nest/${{ matrix.service }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/afisha
+            docker compose pull
+            docker compose up -d
+            docker image prune -f

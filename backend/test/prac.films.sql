@@ -11,5 +11,5 @@ VALUES (
   '/content/afisha/bg1c.jpg'
 )
 ON CONFLICT (id) DO UPDATE 
-SET image = film.image, 
-    cover = film.cover;
+SET image = EXCLUDED.image, 
+    cover = EXCLUDED.cover;
