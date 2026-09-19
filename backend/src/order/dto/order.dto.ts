@@ -1,27 +1,29 @@
-//TODO реализовать DTO для /orders
 import {
   IsEmail,
   IsString,
   IsArray,
   ValidateNested,
   IsNotEmpty,
-  IsNumber,
+  IsInt,
+  IsUUID,
+  ArrayNotEmpty,
+  Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class TicketDto {
-  @IsString()
-  @IsNotEmpty()
+  @IsUUID()
   film: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsUUID()
   session: string;
 
-  @IsNumber()
+  @IsInt()
+  @Min(1)
   row: number;
 
-  @IsNumber()
+  @IsInt()
+  @Min(1)
   seat: number;
 }
 
@@ -34,6 +36,7 @@ export class OrderRequestDto {
   phone: string;
 
   @IsArray()
+  @ArrayNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => TicketDto)
   tickets: TicketDto[];
