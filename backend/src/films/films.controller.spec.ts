@@ -5,6 +5,7 @@ jest.mock('./films.service', () => ({
   })),
 }));
 
+import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { FilmsController } from './films.controller';
 import { FilmsService } from './films.service';
@@ -49,5 +50,15 @@ describe('FilmsController', () => {
 
     expect(result).toEqual({ total: 1, items: mockItems });
     expect(filmsService.findSchedule).toHaveBeenCalledWith('film-1');
+  });
+
+  it('getSchedule → 404, если фильм не найден', async () => {
+    jest
+      .spyOn(filmsService, 'findSchedule')
+      .mockRejectedValue(new NotFoundException());
+
+    await expect(controller.getSchedule('bad')).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });
