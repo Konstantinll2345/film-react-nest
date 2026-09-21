@@ -3,6 +3,7 @@ name: Build and Publish Docker Images
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   build-and-push:
@@ -39,6 +40,7 @@ jobs:
 
   deploy:
     needs: build-and-push
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to server via SSH

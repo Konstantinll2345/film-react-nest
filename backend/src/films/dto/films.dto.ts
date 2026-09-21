@@ -1,4 +1,4 @@
-//TODO описать DTO для запросов к /films
+
 import { Expose } from 'class-transformer';
 
 export class FilmResponseDto {
