@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Film } from '../entities/film.entity';
 import { Schedule } from '../entities/schedule.entity';
 
@@ -12,7 +12,12 @@ export class FilmsRepository {
     private filmRepo: Repository<Film>,
     @InjectRepository(Schedule)
     private scheduleRepo: Repository<Schedule>,
-  ) {}
+    private dataSource: DataSource,
+  ) { }
+
+  async getDataSource(): Promise<DataSource> {
+    return this.dataSource;
+  }
 
   async findAll(): Promise<Film[]> {
     return this.filmRepo.find();
